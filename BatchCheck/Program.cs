@@ -14,8 +14,13 @@ namespace BatchCheck
         {
             try {
                 var input = args[0];
-                var lines = File.ReadAllLines(input).SelectMany(xs => xs.Split(new char[] {'^'}, StringSplitOptions.RemoveEmptyEntries));
-                var filtered = lines.Where(xs => xs.Trim(trimmedChars).StartsWith("-"));
+                var lines = File.ReadAllLines(input);
+                lines[0] = "-" + String.Join("-",   // - remove "program..." but preserve initial args
+                            lines[0].Split('-').Select(xs => xs + "^").Skip(1)
+                );
+
+                var more = lines.SelectMany(xs => xs.Split(new char[] {'^'}, StringSplitOptions.RemoveEmptyEntries));
+                var filtered = more.Where(xs => xs.Trim(trimmedChars).StartsWith("-"));
                 var result = String.Join("", filtered.ToArray());
 
                 // - output
